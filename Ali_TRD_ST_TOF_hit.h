@@ -12,6 +12,7 @@ class Ali_TRD_ST_TOF_hit : public TObject {
    public:
     // constructor
     Ali_TRD_ST_TOF_hit() : TV3_offset(), time(0) {}
+
     // destructor
     ~Ali_TRD_ST_TOF_hit() {}
 

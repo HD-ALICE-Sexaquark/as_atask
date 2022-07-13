@@ -48,7 +48,6 @@ class Ali_TRD_ST_Event : public TObject {
     TClonesArray* fTOFhits;
 
    public:
-    // constructor
     Ali_TRD_ST_Event()
         : x(-3),
           y(-3),
@@ -78,14 +77,15 @@ class Ali_TRD_ST_Event : public TObject {
           fTracks(),
           fTracklets(),
           fMCparticles() {
+        // constructor
         fTracks = new TClonesArray("Ali_TRD_ST_TPC_Track", 10);
         fTracklets = new TClonesArray("Ali_TRD_ST_Tracklets", 10);
         fMCparticles = new TClonesArray("Ali_MC_particle", 10);
         fTOFhits = new TClonesArray("Ali_TRD_ST_TOF_hit", 10);
     }
 
-    // destructor
     ~Ali_TRD_ST_Event() {
+        // destructor
         delete fTracks;
         fTracks = NULL;
         delete fTracklets;
@@ -156,9 +156,10 @@ class Ali_TRD_ST_Event : public TObject {
     Int_t getNumTracklets() const { return fNumTracklets; }
     Ali_TRD_ST_Tracklets* getTracklet(Int_t i) const { return i < fNumTracklets ? (Ali_TRD_ST_Tracklets*)((*fTracklets)[i]) : NULL; }
 
-    Ali_MC_particle* createMCparticle()  // Monte Carlo particle
-    {
-        if (fNumMCparticles == fMCparticles->GetSize()) fMCparticles->Expand(fNumMCparticles + 10);
+    Ali_MC_particle* createMCparticle() {
+        if (fNumMCparticles == fMCparticles->GetSize()) {
+            fMCparticles->Expand(fNumMCparticles + 10);
+        }
         if (fNumMCparticles >= 650000) {
             Fatal("Ali_TRD_ST_Event::createMCparticle()", "ERROR: Too many MC particles (>650000)!");
             exit(2);
@@ -174,7 +175,9 @@ class Ali_TRD_ST_Event : public TObject {
 
     Ali_TRD_ST_TOF_hit* createTOFhit()  // online tracklet
     {
-        if (fNumTOFhits == fTOFhits->GetSize()) fTOFhits->Expand(fNumTOFhits + 10);
+        if (fNumTOFhits == fTOFhits->GetSize()) {
+            fTOFhits->Expand(fNumTOFhits + 10);
+        }
         if (fNumTOFhits >= 650000) {
             Fatal("Ali_TRD_ST_Event::createTOFhit()", "ERROR: Too many TOF hits (>650000)!");
             exit(2);
@@ -189,7 +192,9 @@ class Ali_TRD_ST_Event : public TObject {
     }
 
     Ali_TRD_ST_TPC_Track* createTrack() {
-        if (fNumTracks == fTracks->GetSize()) fTracks->Expand(fNumTracks + 10);
+        if (fNumTracks == fTracks->GetSize()) {
+            fTracks->Expand(fNumTracks + 10);
+        }
         if (fNumTracks >= 65000) {
             Fatal("Ali_TRD_ST_Event::createTrack()", "ERROR: Too many tracks (>65000)!");
             exit(2);
@@ -206,7 +211,9 @@ class Ali_TRD_ST_Event : public TObject {
 
     Ali_TRD_ST_Tracklets* createTracklet()  // online tracklet
     {
-        if (fNumTracklets == fTracklets->GetSize()) fTracklets->Expand(fNumTracklets + 10);
+        if (fNumTracklets == fTracklets->GetSize()) {
+            fTracklets->Expand(fNumTracklets + 10);
+        }
         if (fNumTracklets >= 650000) {
             Fatal("Ali_TRD_ST_Event::createTracklet()", "ERROR: Too many tracklets (>650000)!");
             exit(2);

@@ -176,10 +176,8 @@ Ali_make_tracklets_from_digits::Ali_make_tracklets_from_digits(const Char_t* nam
 
 //_______________________________________________________________________
 TFile* Ali_make_tracklets_from_digits::OpenDigitsFile(TString inputfile, TString digfile, TString opt) {
-    // we should check if we are reading ESDs or AODs - for now, only
-    // ESDs are supported
+    // we should check if we are reading ESDs or AODs - for now, only ESDs are supported
 
-    std::cout << "" << std::endl;
     std::cout << "In OpenDigitsFile" << std::endl;
     // std::cout << "Digits file name: " << digfile.Data() << std::endl;
 
@@ -188,10 +186,8 @@ TFile* Ali_make_tracklets_from_digits::OpenDigitsFile(TString inputfile, TString
         return NULL;
     }
 
-    // TGrid::Connect("alien")
     // construct the name of the digits file from the input file
     inputfile.ReplaceAll("AliESDs.root", digfile);
-    // TString inputfile_LF = "alien:///alice/data/2016/LHC16q/000265525/pass1_CENT_wSDD/16000265525037.6203/TRD.FltDigits.root";
     TString inputfile_LF = inputfile;
 
     // open the file
@@ -202,7 +198,6 @@ TFile* Ali_make_tracklets_from_digits::OpenDigitsFile(TString inputfile, TString
     // if(dfile) delete dfile;
     dfile = TFile::Open(inputfile_LF);
     std::cout << "After TRD digits file" << std::endl;
-    std::cout << "" << std::endl;
 
     if (!dfile) {
         AliWarning("digits file '" + inputfile + "' cannot be opened");
@@ -213,11 +208,12 @@ TFile* Ali_make_tracklets_from_digits::OpenDigitsFile(TString inputfile, TString
 
 //_______________________________________________________________________
 Bool_t Ali_make_tracklets_from_digits::UserNotify() {
-    std::cout << "" << std::endl;
     std::cout << "In UserNotify" << std::endl;
     std::cout << "fDigitsInputFileName: " << fDigitsInputFileName.Data() << std::endl;
 
-    if (!EsdTrackCuts) EsdTrackCuts = new AliESDtrackCuts();
+    if (!EsdTrackCuts) {
+        EsdTrackCuts = new AliESDtrackCuts();
+    }
 
     // From Ruben 11.03.2021
     auto man = AliCDBManager::Instance();
@@ -235,8 +231,12 @@ Bool_t Ali_make_tracklets_from_digits::UserNotify() {
         fDigMan->CreateArrays();
     }
 
-    if (!h_v_fit_vs_det) h_v_fit_vs_det = new TH1D("h_v_fit_vs_det", "h_v_fit_vs_det", 540, 0, 540);
-    if (!h_LA_factor_fit_vs_det) h_LA_factor_fit_vs_det = new TH1D("h_LA_factor_fit_vs_det", "h_LA_factor_fit_vs_det", 540, 0, 540);
+    if (!h_v_fit_vs_det) {
+        h_v_fit_vs_det = new TH1D("h_v_fit_vs_det", "h_v_fit_vs_det", 540, 0, 540);
+    }
+    if (!h_LA_factor_fit_vs_det) {
+        h_LA_factor_fit_vs_det = new TH1D("h_LA_factor_fit_vs_det", "h_LA_factor_fit_vs_det", 540, 0, 540);
+    }
 
     std::cout << "Connected to GRID" << std::endl;
 
@@ -371,13 +371,13 @@ Bool_t Ali_make_tracklets_from_digits::UserNotify() {
     // Float_t valuegainiteration = chambergain->GetValue(det);
 
     // XALEX comment after test
-    printf("Load calibration \n");
+    AliInfo("Load calibration");
     AliTRDcalibDB* const calibration = AliTRDcalibDB::Instance();
     if (!calibration) {
-        printf("No AliTRDcalibDB instance available \n");
+        AliInfo("No AliTRDcalibDB instance available");
         return kFALSE;
     }
-    printf("Run from calibration: %d \n", (int)calibration->GetRun());
+    AliInfoF("Run from calibration: %i", (Int_t)calibration->GetRun());
 
     // TObjString* ts = (TObjString*)list->FindObject("TRD/Calib/ChamberGainFactor");
     // TString string = ts->GetString();
@@ -395,9 +395,9 @@ Bool_t Ali_make_tracklets_from_digits::UserNotify() {
     AliInputEventHandler* inputHandler =
         dynamic_cast<AliInputEventHandler*>(AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
     if (!inputHandler) {
-        printf("WARNING: Inputhandler not available \n");
+        AliWarning("WARNING: InputHandler not available");
     } else {
-        printf("Inputhandler available \n");
+        AliInfo("Inputhandler available");
 
         fPIDResponse = inputHandler->GetPIDResponse();
 
@@ -425,11 +425,13 @@ Bool_t Ali_make_tracklets_from_digits::UserNotify() {
     TString dirname = gSystem->DirName(esdFriendTreeFName);
     dirname += "/";
     esdFriendTreeFName = dirname + basename;
-    std::cout << "Friend name: " << esdFriendTreeFName.Data() << std::endl;
+    AliInfoF("Friend name: %s", esdFriendTreeFName.Data());
 #endif
 
-    std::cout << "Add EsdTrackCuts" << std::endl;
-    if (EsdTrackCuts) std::cout << "EsdTrackCuts exists" << std::endl;
+    AliInfo("Add EsdTrackCuts");
+    if (EsdTrackCuts) {
+        AliInfo("EsdTrackCuts exists");
+    }
     EsdTrackCuts->AliESDtrackCuts::SetRequireTPCRefit(kTRUE);
     EsdTrackCuts->SetMinRatioCrossedRowsOverFindableClustersTPC(0.52);
     EsdTrackCuts->AliESDtrackCuts::SetMinNClustersTPC(50);  // 60, Automatically requires TPC refitted tracks?
@@ -439,12 +441,12 @@ Bool_t Ali_make_tracklets_from_digits::UserNotify() {
     EsdTrackCuts->AliESDtrackCuts::SetEtaRange(-1.0, 1.0);   // 0.85
 
     // create the digits manager
-    std::cout << "Created AliTRDdigitsManager" << std::endl;
-    std::cout << "fDigitsInputFileName: " << fDigitsInputFileName.Data() << std::endl;
+    AliInfo("Created AliTRDdigitsManager");
+    AliInfoF("fDigitsInputFileName: %s", fDigitsInputFileName.Data());
 
     // create a TRD geometry, needed for matching digits to tracks
     if (!fGeo) {
-        AliFatal("cannot create geometry ");
+        AliFatal("Cannot create geometry!");
     }
 
     // if(fDigMan) delete fDigMan;
@@ -511,43 +513,47 @@ Bool_t Ali_make_tracklets_from_digits::UserNotify() {
     }
 
     if (fname.Contains("/home/")) {
-        std::cout << "Load local alignment file" << std::endl;
+        AliInfo("Loading local alignment file");
         TRD_alignment_file = TFile::Open("/home/ceres/schmah/ALICE/Database/TRD_Align_2016.root");
-        std::cout << "Local alignment file loaded" << std::endl;
+        AliInfo("Local alignment file loaded");
     } else {
-        std::cout << "Load alignment file" << std::endl;
+        AliInfo("Loading alignment file");
         TRD_alignment_file =
             fLocalMode ? TFile::Open("/cvmfs/alice-ocdb.cern.ch/calibration/data/2016/OCDB/TRD/Align/Data/Run0_999999999_v1_s0.root")
                        : TFile::Open("alien:///alice/data/2016/OCDB/TRD/Align/Data/Run0_999999999_v1_s0.root");
         // TRD_alignment_file = TFile::Open("/alice/data/2016/OCDB/TRD/Align/Data/Run0_999999999_v1_s0.root");
-        std::cout << "Alignment file from database loaded" << std::endl;
+        AliInfo("Alignment file from database loaded");
     }
 
-    std::cout << "Open calibration file" << std::endl;
+    AliInfo("Opening calibration file...");
     // TRD_calibration_file_AA = TFile::Open("alien::///alice/cern.ch/user/a/aschmah/Data/TRD_Calib_vDfit_and_LAfit_3456.root");
     TRD_calibration_file_AA = fLocalMode
                                   ? TFile::Open("Data/TRD_Calib_vDfit_and_LAfit_23_11_2020.root ")
                                   : TFile::Open("alien::///alice/cern.ch/user/a/aschmah/Data/TRD_Calib_vDfit_and_LAfit_23_11_2020.root ");
-    std::cout << "Calibration file opened" << std::endl;
+    AliInfo("Calibration file opened");
+
     tg_v_fit_vs_det = (TGraph*)TRD_calibration_file_AA->Get("tg_v_fit_vs_det");
     for (Int_t i_det = 0; i_det < 540; i_det++) {
         h_v_fit_vs_det->SetBinContent(i_det + 1, 1.05);
     }
+
     for (Int_t i_point = 0; i_point < tg_v_fit_vs_det->GetN(); i_point++) {
         Double_t det, vD;
         tg_v_fit_vs_det->GetPoint(i_point, det, vD);
         h_v_fit_vs_det->SetBinContent(det + 1, vD);
     }
+
     tg_LA_factor_fit_vs_det = (TGraph*)TRD_calibration_file_AA->Get("tg_LA_factor_fit_vs_det");
     for (Int_t i_det = 0; i_det < 540; i_det++) {
         h_LA_factor_fit_vs_det->SetBinContent(i_det + 1, -0.14);
     }
+
     for (Int_t i_point = 0; i_point < tg_LA_factor_fit_vs_det->GetN(); i_point++) {
         Double_t det, LA;
         tg_LA_factor_fit_vs_det->GetPoint(i_point, det, LA);
         h_LA_factor_fit_vs_det->SetBinContent(det + 1, LA);
     }
-    std::cout << "Calibration file opened" << std::endl;
+    AliInfo("Calibration file opened");
 
     AliCDBEntry* align_cdb = (AliCDBEntry*)TRD_alignment_file->Get("AliCDBEntry");
     TClonesArray* TRD_align_array = (TClonesArray*)align_cdb->GetObject();
@@ -588,20 +594,21 @@ Bool_t Ali_make_tracklets_from_digits::UserNotify() {
             Align_test->GetMatrix(TM_TRD_rotation_sector[sector]);
         }
     }
-    std::cout << "TRD_align_array entries: " << TRD_align_array->GetEntries() << std::endl;
 
-    std::cout << "End of UserNotify" << std::endl;
+    AliInfoF("TRD_align_array entries: %i", TRD_align_array->GetEntries());
+
     return kTRUE;
 }
 
 //________________________________________________________________________
 void Ali_make_tracklets_from_digits::UserCreateOutputObjects() {
-    std::cout << "" << std::endl;
-    std::cout << "In UserCreateOutputObjects" << std::endl;
-    std::cout << "fDigitsInputFileName: " << fDigitsInputFileName.Data() << std::endl;
+    //
+    //
+    //
+    AliInfoF("fDigitsInputFileName: %s", fDigitsInputFileName.Data());
 
     OpenFile(1);
-    std::cout << "File opened" << std::endl;
+    AliInfo("File opened");
 
     fListOfHistos = new TList();
     fListOfHistos->SetOwner();
@@ -610,16 +617,11 @@ void Ali_make_tracklets_from_digits::UserCreateOutputObjects() {
     fListOfHistos->Add(h_ADC);
 
     OpenFile(2);
-    std::cout << "File opened" << std::endl;
+    AliInfo("File opened");
 
     AS_Event = new Ali_AS_Event();
     AS_Track = new Ali_AS_Track();
-    // AS_Tracklet    = new Ali_AS_Tracklet();
-    // AS_offline_Tracklet    = new Ali_AS_offline_Tracklet();
     AS_Digit = new Ali_AS_TRD_digit();
-    Tree_AS_Event = NULL;
-    Tree_AS_Event = new TTree("Tree_AS_Event", "AS_Events");
-    Tree_AS_Event->Branch("Tree_AS_Event_branch", "AS_Event", AS_Event);
 
     TRD_ST_MC_particle = new Ali_MC_particle();
     TRD_ST_Tracklet = new Ali_TRD_ST_Tracklets();
@@ -632,10 +634,9 @@ void Ali_make_tracklets_from_digits::UserCreateOutputObjects() {
     Tree_TRD_ST_Event->Branch("Tree_TRD_ST_Event_branch", "TRD_ST_Event", TRD_ST_Event);
 
     PostData(1, fListOfHistos);
-    // PostData(2,Tree_AS_Event);
     PostData(2, Tree_TRD_ST_Event);
 
-    std::cout << "PostData called" << std::endl;
+    AliInfo("PostData called");
 }
 
 //________________________________________________________________________
@@ -645,17 +646,17 @@ Bool_t Ali_make_tracklets_from_digits::NextEvent(Bool_t preload) {
     fDigitsLoadedFlag = kFALSE;
 
     if (preload) {
-        // std::cout << "Preload"  << std::endl;
         return ReadDigits();
     } else {
-        // std::cout << "No preload"  << std::endl;
         return kTRUE;
     }
 }
 
 //________________________________________________________________________
 void Ali_make_tracklets_from_digits::UserExec(Option_t*) {
-    // std::cout << "Analysis started" << std::endl;
+    //
+    //
+    //
 
     Int_t flag_calibrated = 1;  // 0 = standard fixed precalibration used, 1 = use pre calibration from root input file
     // IMPORTANT: call NextEvent() for book-keeping
@@ -693,7 +694,6 @@ void Ali_make_tracklets_from_digits::UserExec(Option_t*) {
     // Monte Carlo
     // https://alice-doc.github.io/alice-analysis-tutorial/analysis/MC.html
 
-    // std::cout << "Monte carlo loop started" << std::endl;
     TRD_ST_Event->clearMCparticleList();
     fMCEvent = MCEvent();
     if (fMCEvent) {
@@ -743,8 +743,6 @@ void Ali_make_tracklets_from_digits::UserExec(Option_t*) {
         }
     }
 
-    // std::cout << "Monte carlo loop ended" << std::endl;
-
     AliAnalysisManager* man = AliAnalysisManager::GetAnalysisManager();
     if (man) {
         // Int_t run_id = man->GetRunFromPath(); // doesn't work
@@ -770,8 +768,6 @@ void Ali_make_tracklets_from_digits::UserExec(Option_t*) {
 
     printf("---->>>> eventNumber: %d, N_tracks: %d, N_TRD_tracks: %d, N_TRD_tracklets: %d \n", eventNumber, N_tracks, N_TRD_tracks,
            N_TRD_tracklets);
-
-    // printf("RunNum: %d \n",RunNum);
 
     Double_t Sign_magnetic_field = (magF / fabs(magF));
     // std::cout << "Trigger: " <<  fESD->GetFiredTriggerClasses() << std::endl;
@@ -841,7 +837,6 @@ void Ali_make_tracklets_from_digits::UserExec(Option_t*) {
 
     // printf("Event information filled \n");
 
-#if 1
     // printf("Get TOF clusters \n");
 
     TClonesArray* Arr_TOF_Cluster = fESD->GetESDTOFClusters();
@@ -886,7 +881,6 @@ void Ali_make_tracklets_from_digits::UserExec(Option_t*) {
         */
     }
     // std::cout << "Number of TOF clusters: " << NTOFcls << std::endl;
-#endif
 
     // std::cout << "Event number: " << fEventNoInFile << ", event number with TRD digits: " << N_good_events << std::endl;
     // printf("Event number: %d, N_tracks: %d, cent(V0M): %f , cent(CL0): %f
@@ -1589,7 +1583,7 @@ void Ali_make_tracklets_from_digits::UserExec(Option_t*) {
         }
 
         TLorentzVector TL_vec;
-        TL_vec.SetPtEtaPhiM(Track_pT, Track_eta, Track_phi, 0.1349766);
+        TL_vec.SetPtEtaPhiM(Track_pT, Track_eta, Track_phi, 0.1349766);  // ORDINARY!
         AS_Track = AS_Event->createTrack();
         AS_Track->clearTRD_digit_list();
         AS_Track->clearOfflineTrackletList();
@@ -1743,19 +1737,12 @@ void Ali_make_tracklets_from_digits::UserExec(Option_t*) {
     }
     // printf("Track information filled \n");
 
-    // Tree_AS_Event ->Fill();
     Tree_TRD_ST_Event->Fill();  // new tracklets tree to be filled
     // Long64_t size_of_tree = Tree_TRD_ST_Event ->GetEntries();
     // printf("Event: %d, tree filled, size of tree: %lld \n",N_good_events,size_of_tree);
     // printf("Tree filled \n");
 
-#if 0
-    ProcInfo_t procInfo;
-    gSystem->GetProcInfo(&procInfo);
-    AliInfoF("Processing event %i", fEventNoInFile);
-    AliInfoF("Memory: RSS: %3ld VMEM: %3ld",procInfo.fMemResident/1024,procInfo.fMemVirtual/1024);
-#endif
-    printf("Good event: %d, total event: %d \n", N_good_events, N_total_events);
+    AliInfoF("N Good Events so far: %i, N Event: %i \n", N_good_events, N_total_events);
 
     if (fLocalMode) {
         ProcInfo_t procInfo;
@@ -1768,7 +1755,9 @@ void Ali_make_tracklets_from_digits::UserExec(Option_t*) {
 }
 
 TVector3 Ali_make_tracklets_from_digits::calculate_point_on_Straight_dca_to_Point_2D(TVector3& base, TVector3& dir, TVector3& point) {
-    // calculates the TVector3 on the straight line which is closest to point
+    //
+    // Calculate the TVector3 on the straight line which is closest to point
+    //
 
     TVector3 point2d;
     TVector3 base2d;
@@ -1858,9 +1847,6 @@ Double_t Ali_make_tracklets_from_digits::Calc_SVD_tracklet(Int_t i_det, Int_t i_
 }
 
 void Ali_make_tracklets_from_digits::Make_clusters_and_get_tracklets_fit(Double_t Delta_x, Double_t Delta_z, Double_t factor_missing) {
-    // printf("TTRD_ST_Make_Tracklets::Make_clusters_and_get_tracklets_fit() \n");
-
-    // Reset();
 
     std::vector<std::vector<std::vector<std::vector<Double_t>>>> vec_all_TRD_digits;
     std::vector<std::vector<std::vector<std::vector<Double_t>>>> vec_all_TRD_digits_clusters;
@@ -1957,7 +1943,6 @@ void Ali_make_tracklets_from_digits::Make_clusters_and_get_tracklets_fit(Double_
                 arr_used_digits[i_digit_max] = 0;
             }
 
-            //-------------------------------
             // Pre cleaning procedure -> flag digits which are alone, no other digits around in same time window
 
             // Start from the maximum ADC value(s)
@@ -2309,7 +2294,11 @@ void Ali_make_tracklets_from_digits::Make_clusters_and_get_tracklets_fit(Double_
 }
 
 //________________________________________________________________________
-void Ali_make_tracklets_from_digits::Terminate(Option_t*) { std::cout << "In terminate" << std::endl; }
+void Ali_make_tracklets_from_digits::Terminate(Option_t*) {
+    //
+    // Do nothing
+    //
+}
 
 //________________________________________________________________________
 void Ali_make_tracklets_from_digits::FillHelix(AliESDtrack* track_in, Double_t magF_in) {
@@ -2385,7 +2374,6 @@ void Ali_make_tracklets_from_digits::FillHelix(AliESDtrack* track_in, Double_t m
 
         // std::cout << "alpha: " << alpha << ", alpha_alt: " << alpha_alt << std::endl;
 
-        //
         // circle parameters
         // PH Sometimes fP4 and fHelix[4] are very big and the calculation
         // PH of the Sqrt cannot be done. To be investigated...
@@ -2411,8 +2399,6 @@ void Ali_make_tracklets_from_digits::FillHelix(AliESDtrack* track_in, Double_t m
         fHelix_alt[6] = xc_alt * cs_alt - yc_alt * sn_alt;
         fHelix_alt[7] = xc_alt * sn_alt + yc_alt * cs_alt;
         fHelix_alt[8] = TMath::Abs(rc_alt);
-        //
-        //
         fHelix_alt[5] = x_alt * cs_alt - fHelix_alt[0] * sn_alt;  // x0
         fHelix_alt[0] = x_alt * sn_alt + fHelix_alt[0] * cs_alt;  // y0
 
@@ -2521,7 +2507,9 @@ void Ali_make_tracklets_from_digits::FindDCAHelixPoint(TVector3 space_vec, AliHe
 Bool_t Ali_make_tracklets_from_digits::ReadDigits() {
     // std::cout << "In ReadDigits" << std::endl;
     //  don't do anything if the digits have already been loaded
-    if (fDigitsLoadedFlag) return kTRUE;
+    if (fDigitsLoadedFlag) {
+        return kTRUE;
+    }
 
     if (!fDigMan) {
         AliError("no digits manager");

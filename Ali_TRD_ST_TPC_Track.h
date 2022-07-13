@@ -59,6 +59,7 @@ class Ali_TRD_ST_TPC_Track : public TObject {
           Track_length(-3),
           aliHelix_params(),
           aliHelix_TRD_params() {}
+
     // destructor
     ~Ali_TRD_ST_TPC_Track() {}
 
@@ -85,6 +86,7 @@ class Ali_TRD_ST_TPC_Track : public TObject {
     void setTOFsignal(Float_t f) { TOFsignal = f; }
     void setTrack_length(Float_t f) { Track_length = f; }
     void setMC_label(Float_t f) { MC_label = f; }  // borquez edit
+
     void setHelix(Float_t a, Float_t b, Float_t c, Float_t d, Float_t e, Float_t f) {
         aliHelix_params[0] = a;
         aliHelix_params[1] = b;
@@ -93,6 +95,7 @@ class Ali_TRD_ST_TPC_Track : public TObject {
         aliHelix_params[4] = e;
         aliHelix_params[5] = f;
     }
+
     void setHelix_TRD(Float_t a, Float_t b, Float_t c, Float_t d, Float_t e, Float_t f) {
         aliHelix_TRD_params[0] = a;
         aliHelix_TRD_params[1] = b;

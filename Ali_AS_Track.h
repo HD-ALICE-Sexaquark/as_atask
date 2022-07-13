@@ -194,7 +194,9 @@ class Ali_AS_Track : public TObject {
     }
 
     Ali_AS_offline_Tracklet* createOfflineTracklet() {
-        if (fNumOfflineTracklets == fOfflineTracklets->GetSize()) fOfflineTracklets->Expand(fNumOfflineTracklets + 10);
+        if (fNumOfflineTracklets == fOfflineTracklets->GetSize()) {
+            fOfflineTracklets->Expand(fNumOfflineTracklets + 10);
+        }
         if (fNumOfflineTracklets >= 65000) {
             Fatal("Ali_AS_Event::createOfflineTracklet()", "ERROR: Too many tracklets (>65000)!");
             exit(2);
@@ -210,7 +212,9 @@ class Ali_AS_Track : public TObject {
     }
 
     Ali_AS_TRD_digit* createTRD_digit() {
-        if (fNumTRDdigits == fTRD_digits->GetSize()) fTRD_digits->Expand(fNumTRDdigits + 10);
+        if (fNumTRDdigits == fTRD_digits->GetSize()) {
+            fTRD_digits->Expand(fNumTRDdigits + 10);
+        }
         if (fNumTRDdigits >= 50000) {
             Fatal("Ali_AS_Track::createTRD_digit()", "ERROR: Too many TRD digits (>50000)!");
             exit(2);

@@ -8,7 +8,10 @@ class Ali_Helix : public TObject {
     Float_t aliHelix_params[6];
 
    public:
+    // constructor
     Ali_Helix() : aliHelix_params() {}
+
+    // destructor
     ~Ali_Helix() {}
 
     void setHelix(Float_t a, Float_t b, Float_t c, Float_t d, Float_t e, Float_t f) {
@@ -22,18 +25,18 @@ class Ali_Helix : public TObject {
 
     Float_t getHelix_param(Int_t i_param) const { return aliHelix_params[i_param]; }
 
-    void Evaluate(Double_t t,      // helix evaluation, taken from AliHelix
-                  Double_t r[3])  // radius vector
-{
-    // Calculate position of a point on a track and some derivatives at given phase
-    Float_t phase = aliHelix_params[4] * t + aliHelix_params[2];
-    Double_t sn = sinf(phase), cs = cosf(phase);
-    //  Double_t sn=TMath::Sin(phase), cs=TMath::Cos(phase);
+    void Evaluate(Double_t t, Double_t r[3]) {
+        // r[3] = radius vector
+        // helix evaluation, taken from AliHelix
+        // Calculate position of a point on a track and some derivatives at given phase
+        Float_t phase = aliHelix_params[4] * t + aliHelix_params[2];
+        Double_t sn = sinf(phase), cs = cosf(phase);
+        //  Double_t sn=TMath::Sin(phase), cs=TMath::Cos(phase);
 
-    r[0] = aliHelix_params[5] + sn / aliHelix_params[4];
-    r[1] = aliHelix_params[0] - cs / aliHelix_params[4];
-    r[2] = aliHelix_params[1] + aliHelix_params[3] * t;
-}
+        r[0] = aliHelix_params[5] + sn / aliHelix_params[4];
+        r[1] = aliHelix_params[0] - cs / aliHelix_params[4];
+        r[2] = aliHelix_params[1] + aliHelix_params[3] * t;
+    }
 
     ClassDef(Ali_Helix, 1);
 };

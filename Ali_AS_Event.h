@@ -147,7 +147,9 @@ class Ali_AS_Event : public TObject {
     Ali_AS_Tracklet* getTracklet(Int_t i) const { return i < fNumTracklets ? (Ali_AS_Tracklet*)((*fTracklets)[i]) : NULL; }
 
     Ali_AS_TRD_digit* createTRD_digit() {
-        if (fNumTRDdigits == fTRD_digits->GetSize()) fTRD_digits->Expand(fNumTRDdigits + 10);
+        if (fNumTRDdigits == fTRD_digits->GetSize()) {
+            fTRD_digits->Expand(fNumTRDdigits + 10);
+        }
         if (fNumTRDdigits >= 650000) {
             Fatal("Ali_AS_Track::createTRD_digit()", "ERROR: Too many TRD digits (>650000)!");
             exit(2);
@@ -163,7 +165,9 @@ class Ali_AS_Event : public TObject {
     }
 
     Ali_AS_Track* createTrack() {
-        if (fNumTracks == fTracks->GetSize()) fTracks->Expand(fNumTracks + 10);
+        if (fNumTracks == fTracks->GetSize()) {
+            fTracks->Expand(fNumTracks + 10);
+        }
         if (fNumTracks >= 50000) {
             Fatal("Ali_AS_Event::createTrack()", "ERROR: Too many tracks (>50000)!");
             exit(2);
@@ -180,7 +184,9 @@ class Ali_AS_Event : public TObject {
 
     Ali_AS_Tracklet* createTracklet()  // online tracklet
     {
-        if (fNumTracklets == fTracklets->GetSize()) fTracklets->Expand(fNumTracklets + 10);
+        if (fNumTracklets == fTracklets->GetSize()) {
+            fTracklets->Expand(fNumTracklets + 10);
+        }
         if (fNumTracklets >= 650000) {
             Fatal("Ali_AS_Event::createTracklet()", "ERROR: Too many tracklets (>65000)!");
             exit(2);

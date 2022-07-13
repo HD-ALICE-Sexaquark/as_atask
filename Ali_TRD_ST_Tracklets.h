@@ -19,6 +19,7 @@ class Ali_TRD_ST_Tracklets : public TObject {
     // constructor
     Ali_TRD_ST_Tracklets()
         : TV3_offset(), TV3_dir(), TRD_det(-4), ADC_val(), TPC_match(0), n_tracklets_around(0), min_dist_to_next_trkl(-5.0), index(0) {}
+
     // destructor
     ~Ali_TRD_ST_Tracklets() {}
 
