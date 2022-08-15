@@ -213,9 +213,14 @@ void runGridESD_make_tracklets() {
         alienHandler->AddIncludePath("-I. -I$ROOTSYS/include -I$ALICE_ROOT -I$ALICE_ROOT/include -I$ALICE_PHYSICS/include");
 
         // make sure your source files get copied to grid
+        // alienHandler->SetAdditionalLibs(
+        //     "Ali_AS_Event.h Ali_AS_EventLinkDef.h Ali_make_tracklets_from_digits.h Ali_make_tracklets_from_digits.cxx Ali_TRD_ST.h "
+        //     "Ali_TRD_ST_LinkDef.h");
         alienHandler->SetAdditionalLibs(
-            "Ali_AS_Event.h Ali_AS_EventLinkDef.h Ali_make_tracklets_from_digits.h Ali_make_tracklets_from_digits.cxx Ali_TRD_ST.h "
-            "Ali_TRD_ST_LinkDef.h");
+            "Ali_AS_Event.h Ali_AS_Track.h Ali_Helix.h Ali_TRD_ST_LinkDef.h Ali_TRD_ST_Tracklets.h "
+            "Ali_AS_EventLinkDef.h Ali_AS_Tracklet.h Ali_MC_particle.h Ali_TRD_ST_TOF_hit.h Ali_TRD_ST_V0.h "
+            "Ali_AS_TRD_digit.h Ali_AS_offline_Tracklet.h Ali_TRD_ST_Event.h Ali_TRD_ST_TPC_Track.h "
+            "Ali_make_tracklets_from_digits.h");
         alienHandler->SetAnalysisSource("Ali_make_tracklets_from_digits.cxx");
 
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6, 00, 0)

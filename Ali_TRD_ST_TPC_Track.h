@@ -28,7 +28,7 @@ class Ali_TRD_ST_TPC_Track : public TObject {
     Float_t TPCdEdx;              // Energy loss information of TPC
     Float_t TOFsignal;            // Time-of-flight
     Float_t Track_length;         // length of track
-    Float_t MC_label;             // index/label of corresponding MC particle, borquez edit
+    Int_t MC_label;               // index/label of corresponding MC particle, borquez edit
 
     Float_t aliHelix_params[6];
     Float_t aliHelix_TRD_params[6];
@@ -57,6 +57,7 @@ class Ali_TRD_ST_TPC_Track : public TObject {
           TPCdEdx(-3),
           TOFsignal(-3),
           Track_length(-3),
+          MC_label(0),
           aliHelix_params(),
           aliHelix_TRD_params() {}
 
@@ -129,7 +130,7 @@ class Ali_TRD_ST_TPC_Track : public TObject {
     Float_t getTrack_length() const { return Track_length; }
     Float_t getHelix_param(Int_t i_param) const { return aliHelix_params[i_param]; }
     Float_t getHelix_TRD_param(Int_t i_param) const { return aliHelix_TRD_params[i_param]; }
-    Float_t getMC_label() { return MC_label; }  // borquez edit
+    Int_t getMC_label() { return MC_label; }  // borquez edit
 
     void Evaluate(Double_t t, Double_t r[3]) {
         // r[3] = radius vector

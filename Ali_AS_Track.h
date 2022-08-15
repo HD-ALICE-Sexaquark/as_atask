@@ -35,7 +35,7 @@ class Ali_AS_Track : public TObject {
     Float_t Track_length;         // length of track
     Float_t aliHelix_params[9];
     Float_t aliHelix_TRD_params[9];
-    Float_t MC_label;  // index/label of corresponding MC particle, borquez edit
+    Int_t MC_label;  // index/label of corresponding MC particle, borquez edit
 
     UShort_t fNumTRDdigits;         // number of TRD digits for this track
     UShort_t fNumOfflineTracklets;  // number of offline tracklets
@@ -162,7 +162,7 @@ class Ali_AS_Track : public TObject {
     Float_t getTrack_length() const { return Track_length; }
     Float_t getHelix_param(Int_t i_param) const { return aliHelix_params[i_param]; }
     Float_t getHelix_TRD_param(Int_t i_param) const { return aliHelix_TRD_params[i_param]; }
-    Float_t getMC_label() { return MC_label; }  // borquez edit
+    Int_t getMC_label() { return MC_label; }  // borquez edit
     Float_t getTRD_ADC(Int_t i_layer, Int_t i_time_bin) const {
         if (i_layer < 0 || i_layer > 5 || i_time_bin < 0 || i_time_bin > 7) {
             // out of range

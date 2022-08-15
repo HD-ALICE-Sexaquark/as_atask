@@ -44,6 +44,7 @@
 #include "AliESDVertex.h"
 #include "AliESDfriend.h"
 #include "AliESDtrackCuts.h"
+#include "AliESDv0.h"
 
 #include "TChain.h"
 #include "TClonesArray.h"
@@ -625,6 +626,7 @@ void Ali_make_tracklets_from_digits::UserCreateOutputObjects() {
 
     TRD_ST_MC_particle = new Ali_MC_particle();
     TRD_ST_Tracklet = new Ali_TRD_ST_Tracklets();
+    TRD_ST_V0 = new Ali_TRD_ST_V0();  // hoppner edit
     TRD_ST_TOF_hit = new Ali_TRD_ST_TOF_hit();
     TRD_ST_TPC_Track = new Ali_TRD_ST_TPC_Track();
     TRD_ST_Event = new Ali_TRD_ST_Event();
@@ -765,6 +767,7 @@ void Ali_make_tracklets_from_digits::UserExec(Option_t*) {
     Double_t T0zVertex = fESD->GetT0zVertex();
     AliCentrality* Centrality = fESD->GetCentrality();
     Double_t MeanBeamIntAA = fESD->GetESDRun()->GetMeanIntensity(0, 0);
+    Int_t numberV0 = fESD->GetNumberOfV0s();
 
     printf("---->>>> eventNumber: %d, N_tracks: %d, N_TRD_tracks: %d, N_TRD_tracklets: %d \n", eventNumber, N_tracks, N_TRD_tracks,
            N_TRD_tracklets);
@@ -811,6 +814,7 @@ void Ali_make_tracklets_from_digits::UserExec(Option_t*) {
     TRD_ST_Event->clearTrackList();
     TRD_ST_Event->clearTrackletList();
     TRD_ST_Event->clearTOFhitList();
+    TRD_ST_Event->clearV0List();
 
     TRD_ST_Event->setTriggerWord(AS_Event->getTriggerWord());
     TRD_ST_Event->setN_TRD_time_bins(N_time_bins);
@@ -1522,7 +1526,7 @@ void Ali_make_tracklets_from_digits::UserExec(Option_t*) {
         Double_t TOF_signal = track->GetTOFsignal();  // time-of-flight?
         Double_t Track_length = track->GetIntegratedLength();
         UShort_t N_TPC_cls = track->GetTPCNcls();
-        Double_t MC_label = TMath::Abs(track->GetLabel());  // borquez edit
+        Int_t MC_label = TMath::Abs(track->GetLabel());  // borquez edit
 
         Int_t pT_bin;
         for (Int_t i_pT = 0; i_pT < N_pT_bins; i_pT++) {
@@ -1736,6 +1740,31 @@ void Ali_make_tracklets_from_digits::UserExec(Option_t*) {
                                        helix_TRD_par[5]);
     }
     // printf("Track information filled \n");
+
+    // V0 loop Hoppner edit
+    for (Int_t iV0 = 0; iV0 < numberV0; iV0++) {
+        AliESDv0* V0 = fESD->GetV0(iV0);
+        if (!V0) {
+            printf("ERROR: Could not receive V0 %d\n", iV0);
+            continue;
+        }
+
+        TRD_ST_V0 = TRD_ST_Event->createV0();  // online V0
+        Double_t x, y, z;
+        V0->GetXYZ(x, y, z);
+        TRD_ST_V0->SetXYZ(x, y, z);
+
+        Double_t px, py, pz;
+        V0->GetNPxPyPz(px, py, pz);
+        TRD_ST_V0->SetNPxPyPz(px, py, pz);
+        V0->GetPPxPyPz(px, py, pz);
+        TRD_ST_V0->SetPPxPyPz(px, py, pz);
+
+        TRD_ST_V0->SetNindex(V0->GetNindex());
+        TRD_ST_V0->SetPindex(V0->GetPindex());
+        TRD_ST_V0->SetEffMass(V0->GetEffMass());
+        TRD_ST_V0->SetOnFlyStatus(V0->GetOnFlyStatus());
+    }
 
     Tree_TRD_ST_Event->Fill();  // new tracklets tree to be filled
     // Long64_t size_of_tree = Tree_TRD_ST_Event ->GetEntries();
